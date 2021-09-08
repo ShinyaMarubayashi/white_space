@@ -2,7 +2,7 @@ window.addEventListener('load', function () {
   // テキストスプライトを格納する配列
   let textSpriteArr = [];
   // Canvasのサイズ
-  const WIDTH = 00;
+  const WIDTH = 800;
   const HEIGHT = 500;
   // Pixiアプリケーションの生成
   let pixiApp = new PIXI.Application({ 
