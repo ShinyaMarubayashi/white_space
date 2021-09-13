@@ -2,7 +2,7 @@ window.addEventListener('load', function () {
   // テキストスプライトを格納する配列
   let textSpriteArr = [];
   // Canvasのサイズ
-  const WIDTH = 800;
+  const WIDTH = 1000;
   const HEIGHT = 500;
   // Pixiアプリケーションの生成
   let pixiApp = new PIXI.Application({ 
@@ -74,6 +74,55 @@ window.addEventListener('load', function () {
       fontWeight: 'normal',
       fill: 0x000000,
     });
+    // インタラクティブをONにする
+    textSprite.interactive = true;
+    // マウスポインタをハンド型にする
+    textSprite.buttonMode = true;
+    // イベント設定
+    textSprite.on('pointerover', function () {
+      this.style.fill = 0x0000ff;
+    });
+    textSprite.on('pointerout', function () {
+      this.style.fill = 0x000000;
+    });
+    textSprite.clickCount = 0;
+    textSprite.on('pointerdown', function () {
+      this.mouseMoved = false;
+    });
+    textSprite.on('pointermove', function () {
+      this.mouseMoved = true;
+    });
+    textSprite.on('pointerup', function () {
+      let textSprite = this;
+      if (!textSprite.mouseMoved) {
+        textSprite.clickCount++;
+        if (textSprite.clickCount === 1) {
+          setTimeout(function () {
+            // クリック時の処理
+            if (textSprite.clickCount === 1) {
+              textSprite.clickCount = 0;
+              // ラインの表示/非表示
+              lineGraphics = textSprite.getChildAt(0);
+              if (lineGraphics.alpha === 0) {
+                lineGraphics.alpha = 1;
+              } else {
+                lineGraphics.alpha = 0;
+              }
+            } else {
+              textSprite.clickCount = 0;
+            }
+          }, 150);
+        }
+        // ダブルクリック時の処理
+        if (textSprite.clickCount === 2) {
+          // ステージからテキストスプライトを削除
+          pixiApp.stage.removeChild(textSprite);
+          // 配列内からテキストスプライトを削除
+          let index = textSpriteArr.indexOf(textSprite);
+          textSpriteArr.splice(index, 1);
+        }
+      }
+    });
     // テキストスプライトの回転
     textSprite.rotation = random(0, 360) * Math.PI / 180;
     // 矩形の4頂点の座標を取得
@@ -107,6 +156,13 @@ window.addEventListener('load', function () {
     // テキストスプライトの位置設定
     textSprite.x = random(0 + (textSprite.x - left), WIDTH - (right - textSprite.x));
     textSprite.y = random(0 + (textSprite.y - top), HEIGHT - (bottom - textSprite.y));
+    // ライン用のグラフィックスオブジェクトを作成
+    let lineGraphics = new PIXI.Graphics();
+    lineGraphics.alpha = 0;
+    lineGraphics.lineStyle(1, 0x000000);
+    lineGraphics.moveTo(0, textSprite.height * 0.5);
+    lineGraphics.lineTo(textSprite.width, textSprite.height * 0.5);
+    textSprite.addChild(lineGraphics);
     // 戻り値
     return textSprite;
   }
